@@ -19,11 +19,11 @@ const Deposit = () => {
 
   // Bank account details to be displayed
   const bankDetails = {
-    accountTitle: "Wealthy Way Trade",
-    accountNumber: "1234567890123456",
-    bankName: "Soneri Bank",
+    accountTitle: "Ali Nursery",
+    accountNumber: "PK64SONE0014420015102188",
+    bankName: "Soneri bank limited",
     branch: "Main Branch",
-    iban: "PK36EXMP0123456789012345",
+    iban: "PK64SONE0014420015102188",
   };
 
   // Function to handle file selection
@@ -162,19 +162,6 @@ const Deposit = () => {
                     onClick={() => copyToClipboard(bankDetails.bankName)}
                     className="text-[#ffffff80] hover:text-white transition-colors"
                     title="Copy bank name"
-                  >
-                    <FaCopy size={14} />
-                  </button>
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-[#ffffff80]">Branch</p>
-                <p className="font-medium text-sm flex items-center gap-2">
-                  {bankDetails.branch}
-                  <button
-                    onClick={() => copyToClipboard(bankDetails.branch)}
-                    className="text-[#ffffff80] hover:text-white transition-colors"
-                    title="Copy branch name"
                   >
                     <FaCopy size={14} />
                   </button>

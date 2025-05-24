@@ -64,7 +64,7 @@ const botPlans = [
 
 // Bank account details to be displayed
 const bankDetails = {
-  accountTitle: "Ali nursery",
+  accountTitle: "Ali Nursery",
   accountNumber: "PK64SONE0014420015102188",
   bankName: "Soneri bank limited",
   branch: "Main Branch",
