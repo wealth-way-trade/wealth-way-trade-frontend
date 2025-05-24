@@ -69,6 +69,14 @@ const authService = {
     return response.data;
   },
 
+  // Resend OTP
+  resendOTP: async (email: string): Promise<ApiResponse> => {
+    const response = await apiClient.post<ApiResponse>("/auth/resend-otp", {
+      email,
+    });
+    return response.data;
+  },
+
   // Login user
   login: async (data: LoginData): Promise<ApiResponse<AuthTokenData>> => {
     const response = await apiClient.post<ApiResponse<AuthTokenData>>(

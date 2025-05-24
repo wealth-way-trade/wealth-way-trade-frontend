@@ -67,7 +67,28 @@ const SignIn = () => {
         toast.error(response.message || "Login failed");
       }
     } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message: string }>;
+      const axiosError = error as AxiosError<{
+        message: string;
+        data?: { email: string; isVerified: boolean };
+      }>;
+
+      // Check if the error is due to unverified email
+      if (
+        axiosError.response?.status === 403 &&
+        axiosError.response?.data?.data?.isVerified === false
+      ) {
+        toast.info(
+          "Your email needs verification. We've sent you a verification code."
+        );
+        navigate("/verify-otp", {
+          state: {
+            email: axiosError.response.data.data.email,
+            fromLogin: true,
+          },
+        });
+        return;
+      }
+
       const errorMessage =
         axiosError.response?.data?.message || "Login failed. Please try again.";
       toast.error(errorMessage);
@@ -147,7 +168,7 @@ const SignIn = () => {
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => setEmail(e.target.value.toLowerCase())}
                       className="w-full border-b-2 border-[#685C7B] py-3 md:text-lg placeholder:text-[#685C7B]"
                       placeholder={t("email")}
                     />

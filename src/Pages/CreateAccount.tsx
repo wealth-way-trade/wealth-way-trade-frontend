@@ -57,7 +57,7 @@ const CreateAccount = () => {
       // Create registration data with referral code if available
       const registrationData = {
         fullName: name,
-        email,
+        email: email.toLowerCase(),
         password,
         confirmPassword,
         ...(referralCode && { referralCode }),
@@ -119,7 +119,7 @@ const CreateAccount = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
                     className="w-full border-b-2 border-[#685C7B] py-3 md:text-lg placeholder:text-[#685C7B]"
                     placeholder="E-Mail"
                     disabled={loading}

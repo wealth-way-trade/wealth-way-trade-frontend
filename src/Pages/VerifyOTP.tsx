@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoCloseOutline } from "react-icons/io5";
 import { FaArrowRightLong } from "react-icons/fa6";
@@ -11,9 +11,21 @@ import { ApiErrorResponse } from "../services/errorTypes";
 const VerifyOTP = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { email } = location.state || {};
+  const { email, fromLogin } = location.state || {};
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log(
+      "VerifyOTP mounted with email:",
+      email,
+      "fromLogin:",
+      fromLogin
+    );
+    if (!email) {
+      console.error("No email provided to VerifyOTP page");
+    }
+  }, [email, fromLogin]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,13 +42,24 @@ const VerifyOTP = () => {
       return;
     }
 
+    console.log("Verifying OTP for email:", email, "OTP:", otp);
+
     try {
       setLoading(true);
-      const response = await authService.verifyOTP({ email, otp });
+      const response = await authService.verifyOTP({
+        email: email.toLowerCase(),
+        otp,
+      });
 
       if (response.success) {
         toast.success("Email verified successfully!");
-        navigate("/");
+
+        // If coming from login, redirect to sign in to complete login
+        if (fromLogin) {
+          navigate("/sign-in");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error: unknown) {
       let message = "Failed to verify OTP. Please try again.";
@@ -60,8 +83,12 @@ const VerifyOTP = () => {
 
     try {
       setLoading(true);
-      await authService.forgotPassword(email);
-      toast.success("New OTP has been sent to your email");
+      const response = await authService.resendOTP(email.toLowerCase());
+      if (response.success) {
+        toast.success("New OTP has been sent to your email");
+      } else {
+        toast.error(response.message || "Failed to send new OTP");
+      }
     } catch (error: unknown) {
       let message = "Failed to send new OTP. Please try again.";
       if (error instanceof AxiosError && error.response?.data) {
@@ -97,9 +124,9 @@ const VerifyOTP = () => {
               </div>
 
               <p className="text-[#7A6E8C] mt-4">
-                An OTP has been sent to{" "}
-                <span className="text-white">{email}</span>. Please enter it
-                below to verify your account.
+                {fromLogin
+                  ? `Your email ${email} needs to be verified before you can log in. Please enter the OTP sent to your email.`
+                  : `An OTP has been sent to ${email}. Please enter it below to verify your account.`}
               </p>
 
               <form onSubmit={handleSubmit} className="text-white mt-8">
@@ -130,10 +157,10 @@ const VerifyOTP = () => {
               </button>
 
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => navigate(fromLogin ? "/sign-in" : "/register")}
                 className="text-[#7A6E8C] mt-4 text-center w-full block hover:underline"
               >
-                Back to registration
+                {fromLogin ? "Back to login" : "Back to registration"}
               </button>
             </div>
           </div>
