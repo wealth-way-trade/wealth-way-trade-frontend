@@ -24,6 +24,11 @@ import VerifyOTP from "../Pages/VerifyOTP";
 import ResetPassword from "../Pages/ResetPassword";
 import WithdrawalManage from "../Pages/Dashboard/AdminDashboard/WithdrawalManage";
 import BotSubscriptionManage from "../Pages/Dashboard/AdminDashboard/BotSubscriptionManage";
+import PrivacyPolicy from "../Pages/PrivacyPolicy";
+import Faq from "../Pages/Faq";
+import About from "../Pages/About";
+import Features from "../Pages/Features";
+import Contact from "../Pages/Contact";
 
 // Create a wrapper component to preserve query parameters when redirecting
 const RegisterRedirect = () => {
@@ -35,6 +40,11 @@ const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/faq" element={<Faq />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/feature" element={<Features />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/create-account" element={<CreateAccount />} />
       <Route path="/register" element={<RegisterRedirect />} />

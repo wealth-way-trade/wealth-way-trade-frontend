@@ -42,7 +42,7 @@ const Footer = () => {
                                 </li>
                                 <li className="mb-6">
                                     <Link
-                                        to="javascript:;"
+                                        to="/about"
                                         className=" hover:text-primery transition-all duration-500"
                                     >
                                         {t("AboutUs")}
@@ -50,7 +50,7 @@ const Footer = () => {
                                 </li>
                                 <li className="mb-6">
                                     <Link
-                                        to="/admin-dashboard"
+                                        to="/feature"
                                         className=" hover:text-primery transition-all duration-500"
                                     >
                                         {t("Features")}
@@ -58,7 +58,7 @@ const Footer = () => {
                                 </li>
                                 <li>
                                     <Link
-                                        to="javascript:;"
+                                        to="/contact"
                                         className=" hover:text-primery transition-all duration-500"
                                     >
                                         {t("ContactUs")}
@@ -73,7 +73,7 @@ const Footer = () => {
                             <ul className="text-sm  transition-all text-zinc-400 duration-500">
                                 <li className="mb-6">
                                     <Link
-                                        to="javascript:;"
+                                        to="/faq"
                                         className="hover:text-primery transition-all duration-500"
                                     >
                                         {t("FAQs")}
@@ -81,7 +81,7 @@ const Footer = () => {
                                 </li>
                                 <li className="mb-6">
                                     <Link
-                                        to="javascript:;"
+                                        to="/privacy-policy"
                                         className=" hover:text-primery transition-all duration-500"
                                     >
                                         {t("PrivacyPolicy")}
