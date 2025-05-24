@@ -17,6 +17,18 @@ const UserDashboard = () => {
 
   useEffect(() => {
     fetchUserData();
+
+    // Listen for balance update events from trading
+    const handleBalanceUpdate = () => {
+      console.log("Balance update event received in UserDashboard");
+      fetchUserData();
+    };
+
+    window.addEventListener("balanceUpdated", handleBalanceUpdate);
+
+    return () => {
+      window.removeEventListener("balanceUpdated", handleBalanceUpdate);
+    };
   }, []);
 
   const fetchUserData = async () => {

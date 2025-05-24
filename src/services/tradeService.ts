@@ -25,6 +25,8 @@ export interface Trade {
   startTime: string;
   endTime: string;
   createdAt: string;
+  userBalance?: number;
+  userTotalProfit?: number;
 }
 
 // Trade service functions

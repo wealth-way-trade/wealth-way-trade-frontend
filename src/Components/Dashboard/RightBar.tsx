@@ -170,7 +170,11 @@ const RightBar = ({
               } active:translate-y-0.5 border border-[#5726a8] w-full`}
             >
               <RiRobot2Line className="mr-2" />
-              {botActive ? `${botType} Bot (${botProfitRate}%)` : "Enable Bot"}
+              {botActive
+                ? `${botType?.slice(0, 1).toUpperCase()}${botType?.slice(
+                    1
+                  )} Bot (${botProfitRate}%)`
+                : "Enable Bot"}
             </Button>
             {!botActive && (
               <div className="w-full h-full cursor-not-allowed flex items-center justify-center bg-[#2c174f56] absolute top-0 left-0">

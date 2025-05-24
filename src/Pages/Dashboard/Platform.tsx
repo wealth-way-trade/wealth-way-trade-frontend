@@ -56,14 +56,20 @@ const Platform = () => {
     };
   }, [tradeStatus, remainingTime]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = async (): Promise<boolean> => {
     try {
       const profileResponse = await authService.getProfile();
+      console.log("User profile response:", profileResponse);
       if (profileResponse.success && profileResponse.data) {
+        console.log("Updating balance to:", profileResponse.data.balance);
+        console.log("User total profit:", profileResponse.data.totalProfit);
         setBalance(profileResponse.data.balance);
+        return true;
       }
+      return false;
     } catch (error) {
       console.error("Error fetching user data:", error);
+      return false;
     }
   };
 
@@ -128,14 +134,19 @@ const Platform = () => {
 
         if (!tradeId) {
           console.error("No trade ID found in API response:", response.data);
-          // Fallback to local simulation if no trade ID
-          simulateLocalTrade(amount);
+          toast.error(
+            "Trade started but no ID received. Please check your balance manually."
+          );
+          setTradeStatus("idle");
           return;
         }
 
         // Use the actual duration from state (converted to milliseconds)
         const actualDuration = duration * 1000;
         console.log(`Trade will complete in ${duration} seconds`);
+
+        // Immediately update balance to reflect the deduction
+        setBalance((prevBalance) => prevBalance - amount);
 
         setTimeout(() => {
           completeTrade(tradeId, amount);
@@ -149,8 +160,21 @@ const Platform = () => {
     } catch (error) {
       console.error("Error starting trade:", error);
 
-      // Fallback to local simulation for demo
-      simulateLocalTrade(amount);
+      // Check if it's a network error or API error
+      if (error instanceof Error) {
+        toast.error(`Failed to start trade: ${error.message}`);
+      }
+
+      // Ask user before falling back to local simulation
+      const shouldSimulate = window.confirm(
+        "Failed to connect to server. Would you like to simulate the trade locally? (Note: This won't save your profits)"
+      );
+
+      if (shouldSimulate) {
+        simulateLocalTrade(amount);
+      } else {
+        setTradeStatus("idle");
+      }
     } finally {
       setLoading(false);
     }
@@ -158,16 +182,34 @@ const Platform = () => {
 
   // Fallback function to simulate a trade locally if API isn't available
   const simulateLocalTrade = (tradeAmount: number) => {
-    toast.info(
-      `Simulating trade locally - will complete in ${duration} seconds`
-    );
+    toast.info(`Trade has been started - will complete in ${duration} seconds`);
     setRemainingTime(duration); // Set the countdown timer
 
     // Use the actual duration from state
     const actualDuration = duration * 1000;
 
     setTimeout(() => {
-      const profitPercentage = Math.floor(Math.random() * 6) + 10; // 10-15%
+      let profitPercentage = 5; // Default 5% without bot
+
+      if (activeSubscription && botType) {
+        switch (botType) {
+          case BotType.BASIC:
+            // 10-15% profit for basic bot
+            profitPercentage = Math.floor(Math.random() * 6) + 10;
+            break;
+          case BotType.ADVANCED:
+            // 15-20% profit for advanced bot
+            profitPercentage = Math.floor(Math.random() * 6) + 15;
+            break;
+          case BotType.PRO:
+            // 20-25% profit for pro bot
+            profitPercentage = Math.floor(Math.random() * 6) + 20;
+            break;
+          default:
+            profitPercentage = 5; // Default 5%
+        }
+      }
+
       const profit = Math.floor(tradeAmount * (profitPercentage / 100));
 
       // Update local state for UI
@@ -177,7 +219,7 @@ const Platform = () => {
         percentage: profitPercentage,
       });
       setTradeStatus("completed");
-      setBalance((prevBalance) => prevBalance + profit); // Only add profit for local simulation
+      setBalance((prevBalance) => prevBalance + tradeAmount + profit); // Add both original amount and profit
 
       toast.success(`Trade completed! You earned ${formatCurrency(profit)}`);
 
@@ -194,25 +236,25 @@ const Platform = () => {
       console.log("Completing trade with ID:", tradeId); // Log the trade ID
 
       // Calculate profit based on bot type or default rate
-      let profitPercentage = 10; // Default 10%
+      let profitPercentage = 5; // Default 5% without bot
 
       if (activeSubscription && botType) {
         switch (botType) {
           case BotType.BASIC:
-            profitPercentage = 12; // 12% profit for basic bot
+            // 10-15% profit for basic bot
+            profitPercentage = Math.floor(Math.random() * 6) + 10;
             break;
           case BotType.ADVANCED:
-            profitPercentage = 14; // 14% profit for advanced bot
+            // 15-20% profit for advanced bot
+            profitPercentage = Math.floor(Math.random() * 6) + 15;
             break;
           case BotType.PRO:
-            profitPercentage = 15; // 15% profit for pro bot
+            // 20-25% profit for pro bot
+            profitPercentage = Math.floor(Math.random() * 6) + 20;
             break;
           default:
-            profitPercentage = 10; // Default
+            profitPercentage = 5; // Default 5%
         }
-      } else {
-        // If no bot, randomize between 10-15%
-        profitPercentage = Math.floor(Math.random() * 6) + 10;
       }
 
       const profit = Math.floor(tradeAmount * (profitPercentage / 100));
@@ -226,7 +268,22 @@ const Platform = () => {
 
       console.log("Complete trade response:", response);
 
-      if (response.success) {
+      if (response.success && response.data) {
+        // Log the returned trade data
+        console.log("Trade completion data:", response.data);
+
+        // Check if backend returned updated balance/profit
+        if (response.data.userBalance !== undefined) {
+          console.log(
+            "Backend confirmed new balance:",
+            response.data.userBalance
+          );
+          console.log(
+            "Backend confirmed total profit:",
+            response.data.userTotalProfit
+          );
+        }
+
         // Update local state for UI
         setTradeResult({
           amount: tradeAmount,
@@ -234,6 +291,13 @@ const Platform = () => {
           percentage: profitPercentage,
         });
         setTradeStatus("completed");
+
+        // Immediately update the local balance (original amount + profit)
+        const newBalance = balance + tradeAmount + profit;
+        console.log(
+          `Updating balance: ${balance} + ${tradeAmount} + ${profit} = ${newBalance}`
+        );
+        setBalance(newBalance);
 
         // Show toast notification with profit info
         toast.success(`Trade completed! You earned ${formatCurrency(profit)}`);
@@ -244,21 +308,43 @@ const Platform = () => {
           setTradeResult(null);
         }, 10000);
 
-        // Refresh user data after a small delay to ensure backend has processed the change
-        setTimeout(() => {
+        // Refresh user data after a longer delay to ensure backend has processed the change
+        setTimeout(async () => {
           console.log("Refreshing user data...");
-          fetchUserData();
-        }, 2000);
+          await fetchUserData();
+          console.log("Data refreshed, dispatching balance update event");
+
+          // Dispatch a custom event to refresh balance in other components
+          window.dispatchEvent(new Event("balanceUpdated"));
+        }, 3000);
       } else {
+        console.error("Trade completion failed:", response);
         throw new Error(response.message || "Failed to complete trade");
       }
     } catch (error) {
       console.error("Error completing trade:", error);
       setTradeStatus("idle");
-      toast.error("Error completing trade");
 
-      // Fallback to local simulation
-      simulateLocalTrade(tradeAmount);
+      // More specific error handling
+      if (error instanceof Error) {
+        if (
+          error.message.includes("Network") ||
+          error.message.includes("fetch")
+        ) {
+          toast.error(
+            "Network error: Could not complete trade. Please check your connection."
+          );
+        } else {
+          toast.error(`Error completing trade: ${error.message}`);
+        }
+      } else {
+        toast.error("Unknown error completing trade");
+      }
+
+      // Don't automatically fall back to simulation - let user decide
+      toast.warning(
+        "Your trade could not be completed on the server. Profits may not be saved."
+      );
     }
   };
 
@@ -282,17 +368,17 @@ const Platform = () => {
 
   // Calculate bot profit rate
   const getBotProfitRate = (): number => {
-    if (!botType) return 10;
+    if (!botType) return 5;
 
     switch (botType) {
       case BotType.BASIC:
-        return 12;
+        return 12.5; // Mid-point of 10-15%
       case BotType.ADVANCED:
-        return 14;
+        return 17.5; // Mid-point of 15-20%
       case BotType.PRO:
-        return 15;
+        return 22.5; // Mid-point of 20-25%
       default:
-        return 10;
+        return 5;
     }
   };
 

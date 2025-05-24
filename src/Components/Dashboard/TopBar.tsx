@@ -11,16 +11,33 @@ const TopBar = () => {
 
   useEffect(() => {
     fetchUserData();
+
+    // Listen for balance update events
+    const handleBalanceUpdate = () => {
+      console.log("Balance update event received in TopBar");
+      fetchUserData();
+    };
+
+    window.addEventListener("balanceUpdated", handleBalanceUpdate);
+
+    return () => {
+      window.removeEventListener("balanceUpdated", handleBalanceUpdate);
+    };
   }, []);
 
   const fetchUserData = async () => {
     try {
       const profileResponse = await authService.getProfile();
+      console.log("TopBar - User profile response:", profileResponse);
       if (profileResponse.success && profileResponse.data) {
+        console.log(
+          "TopBar - Updating balance to:",
+          profileResponse.data.balance
+        );
         setBalance(profileResponse.data.balance);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("TopBar - Error fetching user data:", error);
     }
   };
 
