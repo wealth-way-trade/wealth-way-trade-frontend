@@ -44,19 +44,36 @@ const BottomBar = ({
   };
 
   const handleIncreaseTime = () => {
-    if (time < 45) {
+    if (time < 60) {
+      // Below 60 seconds, increment by 5 seconds
       setTime(time + 5);
+    } else if (time < 300) {
+      // At or above 60 seconds, increment by 1 minute (60 seconds)
+      setTime(time + 60);
     } else {
-      toast.warning("Maximum time is 45 seconds.");
+      toast.warning("Maximum time is 5 minutes.");
     }
   };
 
   const handleDecreaseTime = () => {
-    if (time > 5) {
+    if (time > 60) {
+      // Above 60 seconds, decrement by 1 minute (60 seconds)
+      setTime(time - 60);
+    } else if (time > 15) {
+      // Between 15 and 60 seconds, decrement by 5 seconds
       setTime(time - 5);
     } else {
-      toast.warning("Minimum time is 5 seconds.");
+      toast.warning("Minimum time is 15 seconds.");
     }
+  };
+
+  // Format time display
+  const formatTime = (seconds: number): string => {
+    if (seconds >= 60) {
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes} min`;
+    }
+    return `${seconds} sec`;
   };
 
   return (
@@ -91,7 +108,7 @@ const BottomBar = ({
             <input
               type="text"
               className="w-full rounded-lg p-2 text-white text-center bg-transparent"
-              value={`${time} sec`}
+              value={formatTime(time)}
               readOnly
             />
             <button onClick={handleIncreaseTime}>

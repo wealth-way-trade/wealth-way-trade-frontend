@@ -67,6 +67,16 @@ const Withdrawal = () => {
       return;
     }
 
+    // Check if user has sufficient balance
+    if (userProfile && amountValue > userProfile.balance) {
+      toast.error(
+        `Insufficient balance. Your current balance is ${formatAmount(
+          userProfile.balance
+        )}`
+      );
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const response = await transactionService.createWithdrawal({
@@ -109,12 +119,27 @@ const Withdrawal = () => {
             min="5000"
             max="50000"
             disabled={isSubmitting}
+            className={
+              userProfile && parseFloat(amount) > userProfile.balance
+                ? "border-red-500"
+                : ""
+            }
           />
+          {userProfile && parseFloat(amount) > userProfile.balance && (
+            <p className="text-red-500 text-sm mt-1">
+              Amount exceeds your available balance of{" "}
+              {formatAmount(userProfile.balance)}
+            </p>
+          )}
 
           <Button
             className="w-full rounded-lg p-6 text-white bg-[#5f29b7] cursor-pointer transition-all duration-500 hover:bg-[#5f29b7]/80 mt-4"
             onClick={handleWithdrawal}
-            disabled={isSubmitting || !amount}
+            disabled={
+              isSubmitting ||
+              !amount ||
+              !!(userProfile && parseFloat(amount) > userProfile.balance)
+            }
           >
             {isSubmitting ? "Processing..." : "Request Withdrawal"}
           </Button>

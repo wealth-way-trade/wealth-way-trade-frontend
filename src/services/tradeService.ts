@@ -4,7 +4,7 @@ import { ApiResponse } from "./errorTypes";
 // Trade types
 export interface TradeRequest {
   amount: number;
-  duration: number; // Duration in minutes
+  duration: number; // Duration in seconds
   isBot?: boolean;
 }
 

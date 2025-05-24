@@ -17,7 +17,7 @@ const Platform = () => {
 
   // Trade state
   const [amount, setAmount] = useState<number>(5000);
-  const [duration, setDuration] = useState<number>(5);
+  const [duration, setDuration] = useState<number>(60);
   const [loading, setLoading] = useState<boolean>(false);
   const [tradeStatus, setTradeStatus] = useState<
     "idle" | "processing" | "completed"
@@ -27,11 +27,34 @@ const Platform = () => {
     profit: number;
     percentage: number;
   } | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number>(0);
 
   useEffect(() => {
     fetchUserData();
     fetchBotSubscription();
   }, []);
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (tradeStatus === "processing" && remainingTime > 0) {
+      interval = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [tradeStatus, remainingTime]);
 
   const fetchUserData = async () => {
     try {
@@ -85,11 +108,12 @@ const Platform = () => {
     try {
       setLoading(true);
       setTradeStatus("processing");
+      setRemainingTime(duration); // Set the countdown timer
 
       // Start the trade
       const response = await tradeService.startTrade({
         amount,
-        duration,
+        duration, // duration is in seconds
         isBot: activeSubscription,
       });
 
@@ -109,14 +133,15 @@ const Platform = () => {
           return;
         }
 
-        // For UI demo purposes, we'll use a shorter time (10 seconds)
-        const demoTime = 10 * 1000;
+        // Use the actual duration from state (converted to milliseconds)
+        const actualDuration = duration * 1000;
+        console.log(`Trade will complete in ${duration} seconds`);
 
         setTimeout(() => {
           completeTrade(tradeId, amount);
-        }, demoTime);
+        }, actualDuration);
 
-        toast.success("Trade started successfully");
+        toast.success(`Trade started! Will complete in ${duration} seconds`);
       } else {
         setTradeStatus("idle");
         toast.error(response.message || "Failed to start trade");
@@ -133,10 +158,13 @@ const Platform = () => {
 
   // Fallback function to simulate a trade locally if API isn't available
   const simulateLocalTrade = (tradeAmount: number) => {
-    toast.info("Simulating trade locally (development mode)");
+    toast.info(
+      `Simulating trade locally - will complete in ${duration} seconds`
+    );
+    setRemainingTime(duration); // Set the countdown timer
 
-    // For UI demo purposes, we'll use a shorter time (10 seconds)
-    const demoTime = 10 * 1000;
+    // Use the actual duration from state
+    const actualDuration = duration * 1000;
 
     setTimeout(() => {
       const profitPercentage = Math.floor(Math.random() * 6) + 10; // 10-15%
@@ -158,7 +186,7 @@ const Platform = () => {
         setTradeStatus("idle");
         setTradeResult(null);
       }, 10000);
-    }, demoTime);
+    }, actualDuration);
   };
 
   const completeTrade = async (tradeId: string, tradeAmount: number) => {
@@ -243,6 +271,15 @@ const Platform = () => {
     }).format(amount);
   };
 
+  const formatRemainingTime = (seconds: number): string => {
+    if (seconds >= 60) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    }
+    return `${seconds}s`;
+  };
+
   // Calculate bot profit rate
   const getBotProfitRate = (): number => {
     if (!botType) return 10;
@@ -277,6 +314,10 @@ const Platform = () => {
               <p className="text-sm text-gray-400">
                 Your trade of {formatCurrency(amount)} is being processed
               </p>
+              <p className="text-2xl font-bold text-[#5f29b7] mt-4">
+                {formatRemainingTime(remainingTime)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Time remaining</p>
             </div>
           )}
 
@@ -333,7 +374,7 @@ const Platform = () => {
             time={duration}
             setTime={setDuration}
             onStartTrade={handleStartTrade}
-            isLoading={loading}
+            isLoading={loading || tradeStatus === "processing"}
             botActive={activeSubscription}
             botType={botType}
             botProfitRate={getBotProfitRate()}
@@ -345,7 +386,7 @@ const Platform = () => {
           duration={duration}
           setDuration={setDuration}
           onStartTrade={handleStartTrade}
-          isLoading={loading}
+          isLoading={loading || tradeStatus === "processing"}
           botActive={activeSubscription}
           botType={botType}
           botProfitRate={getBotProfitRate()}

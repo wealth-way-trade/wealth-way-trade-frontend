@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import { Button } from "../ui/button";
 import { RiRobot2Line } from "react-icons/ri";
 import { BotType } from "../../services/botService";
+import { toast } from "react-toastify";
 
 interface RightBarProps {
   amount: number;
@@ -39,6 +40,39 @@ const RightBar = ({
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const handleIncreaseTime = () => {
+    if (duration < 60) {
+      // Below 60 seconds, increment by 5 seconds
+      setDuration(duration + 5);
+    } else if (duration < 300) {
+      // At or above 60 seconds, increment by 1 minute (60 seconds)
+      setDuration(duration + 60);
+    } else {
+      toast.warning("Maximum time is 5 minutes.");
+    }
+  };
+
+  const handleDecreaseTime = () => {
+    if (duration > 60) {
+      // Above 60 seconds, decrement by 1 minute (60 seconds)
+      setDuration(duration - 60);
+    } else if (duration > 15) {
+      // Between 15 and 60 seconds, decrement by 5 seconds
+      setDuration(duration - 5);
+    } else {
+      toast.warning("Minimum time is 15 seconds.");
+    }
+  };
+
+  // Format time display
+  const formatTime = (seconds: number): string => {
+    if (seconds >= 60) {
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes} min`;
+    }
+    return `${seconds} sec`;
   };
 
   return (
@@ -97,18 +131,18 @@ const RightBar = ({
           <input
             type="text"
             className="p-3 w-full mt-1 border border-[#3f2b5f] rounded-lg text-white appearance-none"
-            value={`${duration} min`}
+            value={formatTime(duration)}
             readOnly
           />
           <div className="flex items-center gap-2 mt-2">
             <button
-              onClick={() => setDuration(Math.max(5, duration - 5))}
+              onClick={handleDecreaseTime}
               className="bg-[#5f29b760] hover:opacity-80 transition-all duration-500 active:scale-95 w-full py-0.5 rounded-full text-2xl text-white cursor-pointer"
             >
               -
             </button>
             <button
-              onClick={() => setDuration(duration + 5)}
+              onClick={handleIncreaseTime}
               className="bg-[#5f29b760] hover:opacity-80 transition-all duration-500 active:scale-95 w-full py-0.5 rounded-full text-2xl text-white cursor-pointer"
             >
               +
