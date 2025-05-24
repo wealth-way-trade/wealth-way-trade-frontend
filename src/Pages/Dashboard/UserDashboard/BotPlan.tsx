@@ -26,7 +26,7 @@ import { AxiosError } from "axios";
 const botPlans = [
   {
     name: "Free",
-    price: "$0.00/month",
+    price: "0.00/month",
     features: {
       "Basic Bot": false,
       "Advanced Bot": false,
@@ -35,7 +35,7 @@ const botPlans = [
   },
   {
     name: "Basic Bot",
-    price: "$29/month",
+    price: "5000/month",
     features: {
       "Basic Bot": true,
       "Advanced Bot": false,
@@ -44,7 +44,7 @@ const botPlans = [
   },
   {
     name: "Advanced Bot",
-    price: "$59/month",
+    price: "10,000/month",
     features: {
       "Basic Bot": true,
       "Advanced Bot": true,
@@ -53,7 +53,7 @@ const botPlans = [
   },
   {
     name: "Pro Bot",
-    price: "$99/month",
+    price: "15,000/month",
     features: {
       "Basic Bot": true,
       "Advanced Bot": true,
@@ -64,9 +64,9 @@ const botPlans = [
 
 // Bank account details to be displayed
 const bankDetails = {
-  accountTitle: "Wealthy Way Trade",
-  accountNumber: "1234567890123456",
-  bankName: "Soneri Bank",
+  accountTitle: "Ali nursery",
+  accountNumber: "PK64SONE0014420015102188",
+  bankName: "Soneri bank limited",
   branch: "Main Branch",
 };
 
@@ -290,7 +290,7 @@ const BotPlan = () => {
                         )
                       )}
                       <td className="px-5 py-6 font-medium text-center text-[#ffffffd0]">
-                        {bot.price}
+                        <span className="opacity-70 text-xs">PKR</span> {bot.price}
                       </td>
                     </tr>
                   ))}

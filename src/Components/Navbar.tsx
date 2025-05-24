@@ -59,9 +59,9 @@ const Navbar = () => {
 
                             {
                                 isOpenLanguageDropDown && (
-                                    <div className="absolute w-20 top-8 -left-4 fadeIn p-2 rounded-lg bg-[#5f29b7]">
-                                        <button onClick={english} className="hover:bg-[#7641cd] w-full transition-all duration-500 cursor-pointer px-3 py-1.5 rounded-lg">en</button>
-                                        <button onClick={urdu} className="hover:bg-[#7641cd] w-full transition-all duration-500 cursor-pointer px-3 py-1.5 rounded-lg">ur</button>
+                                    <div className="absolute w-24 top-8 -left-4 fadeIn p-2 rounded-lg bg-[#5f29b7]">
+                                        <button onClick={english} className="hover:bg-[#7641cd] w-full transition-all duration-500 cursor-pointer px-3 py-1.5 rounded-lg">English</button>
+                                        <button onClick={urdu} className="hover:bg-[#7641cd] w-full transition-all duration-500 cursor-pointer px-3 py-1.5 rounded-lg">Urdu</button>
                                     </div>
                                 )
                             }

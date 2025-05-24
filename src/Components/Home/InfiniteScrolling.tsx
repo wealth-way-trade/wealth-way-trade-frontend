@@ -16,7 +16,7 @@ const InfiniteScrolling = () => {
                 <img src="/home/binance.png" alt="crypto" className='md:w-52 w-36 hover:border-[#8F00FF] border border-transparent duration-500 transition-all rounded-3xl' />
             </Slider.Slide>
             <Slider.Slide>
-                <img src="/home/ftx.png" alt="crypto" className='md:w-52 w-36 hover:border-[#8F00FF] border border-transparent duration-500 transition-all rounded-3xl' />
+                <img src="/home/ok.png" alt="crypto" className='md:w-52 w-36 hover:border-[#8F00FF] border border-transparent duration-500 transition-all rounded-3xl' />
             </Slider.Slide>
             <Slider.Slide>
                 <img src="/home/huobi.png" alt="crypto" className='md:w-52 w-36 hover:border-[#8F00FF] border border-transparent duration-500 transition-all rounded-3xl' />
