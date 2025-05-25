@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from "../../../Components/ui/dialog";
 import { FaCheck, FaTimes, FaCopy, FaEye } from "react-icons/fa";
+import { AxiosError } from "axios";
 
 // Simple textarea component since it's missing
 const Textarea = ({
@@ -148,7 +149,16 @@ const WithdrawalManage = () => {
       }
     } catch (error) {
       console.error(`Error ${actionType}ing withdrawal:`, error);
-      toast.error(`Failed to ${actionType} withdrawal. Please try again.`);
+
+      // Check if it's an axios error with a response
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response?.data?.message) {
+        // Display the specific error message from the backend
+        toast.error(axiosError.response.data.message);
+      } else {
+        // Fallback generic error message
+        toast.error(`Failed to ${actionType} withdrawal. Please try again.`);
+      }
     } finally {
       setProcessingId(null);
     }

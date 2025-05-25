@@ -88,6 +88,12 @@ const Withdrawal = () => {
         toast.success("Withdrawal request submitted successfully");
         // Reset form
         setAmount("");
+
+        // Refresh user profile to get updated balance
+        await fetchUserProfile();
+
+        // Dispatch a custom event to refresh balance in other components
+        window.dispatchEvent(new Event("balanceUpdated"));
       } else {
         toast.error(response.message || "Failed to process withdrawal request");
       }
