@@ -18,6 +18,7 @@ import AdminDashboard from "../Pages/Dashboard/AdminDashboard/AdminDashboard";
 import AdminProtected from "./AdminProtected";
 import UserDetail from "../Pages/Dashboard/AdminDashboard/UserDetail";
 import EventsAdd from "../Pages/Dashboard/AdminDashboard/EventsAdd";
+import EventEdit from "../Pages/Dashboard/AdminDashboard/EventEdit";
 import EventsManage from "../Pages/Dashboard/AdminDashboard/EventsManage";
 import DepositManage from "../Pages/Dashboard/AdminDashboard/DepositManage";
 import VerifyOTP from "../Pages/VerifyOTP";
@@ -71,6 +72,7 @@ const Router = () => {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/user-detail/:userId" element={<UserDetail />} />
         <Route path="/event-add" element={<EventsAdd />} />
+        <Route path="/event-edit/:eventId" element={<EventEdit />} />
         <Route path="/events-manage" element={<EventsManage />} />
         <Route path="/deposits-manage" element={<DepositManage />} />
         <Route path="/withdrawals-manage" element={<WithdrawalManage />} />

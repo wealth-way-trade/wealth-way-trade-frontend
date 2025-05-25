@@ -28,6 +28,14 @@ const eventService = {
     return response.data;
   },
 
+  // Get event by ID (admin only)
+  getEventById: async (eventId: string): Promise<ApiResponse<Event>> => {
+    const response = await apiClient.get<ApiResponse<Event>>(
+      `/events/${eventId}`
+    );
+    return response.data;
+  },
+
   // Create a new event (admin only)
   createEvent: async (data: CreateEventData): Promise<ApiResponse<Event>> => {
     const response = await apiClient.post<ApiResponse<Event>>("/events", data);

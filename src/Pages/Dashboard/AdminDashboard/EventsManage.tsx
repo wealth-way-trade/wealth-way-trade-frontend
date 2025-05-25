@@ -13,6 +13,7 @@ const EventsManage = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -57,6 +58,11 @@ const EventsManage = () => {
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleEdit = (eventId: string) => {
+    setEditingId(eventId);
+    navigate(`/event-edit/${eventId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -116,8 +122,12 @@ const EventsManage = () => {
                 </h3>
                 <div className="flex items-center space-x-3">
                   <FaEdit
-                    className="text-blue-400 cursor-pointer hover:text-blue-300 transition"
-                    onClick={() => navigate(`/event-edit/${event.id}`)}
+                    className={`text-blue-400 cursor-pointer hover:text-blue-300 transition ${
+                      editingId === event.id ? "opacity-50" : ""
+                    }`}
+                    onClick={() =>
+                      editingId !== event.id && handleEdit(event.id)
+                    }
                   />
                   <FaTrash
                     className={`text-red-400 cursor-pointer hover:text-red-300 transition ${
