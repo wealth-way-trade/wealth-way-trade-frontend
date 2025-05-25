@@ -20,6 +20,7 @@ const UserDetail = () => {
   const [userDetails, setUserDetails] = useState<UserDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentDomain, setCurrentDomain] = useState("");
+  const [makingAdmin, setMakingAdmin] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -94,6 +95,34 @@ const UserDetail = () => {
     }));
   };
 
+  const handleMakeAdmin = async () => {
+    if (!userId || !userDetails) return;
+
+    if (
+      confirm(`Are you sure you want to make ${userDetails.fullName} an admin?`)
+    ) {
+      try {
+        setMakingAdmin(true);
+        const response = await userService.makeUserAdmin(userId);
+
+        if (response.success) {
+          toast.success(
+            `${userDetails.fullName} has been made an admin successfully`
+          );
+          // Refresh user details to update the UI
+          await fetchUserDetails(userId);
+        } else {
+          toast.error(response.message || "Failed to make user an admin");
+        }
+      } catch (error) {
+        console.error("Error making user admin:", error);
+        toast.error("Failed to make user an admin. Please try again.");
+      } finally {
+        setMakingAdmin(false);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-[#171022] w-full min-h-screen p-5 flex items-center justify-center">
@@ -154,13 +183,24 @@ const UserDetail = () => {
                 >
                   Status: {userDetails.isVerified ? "Active" : "Inactive"}
                 </p>
+                {userDetails.isAdmin && (
+                  <p className="font-normal text-base leading-7 max-sm:text-center text-purple-500">
+                    Role: Admin
+                  </p>
+                )}
               </div>
-              <Button className="rounded-full py-6">
-                <GrUserAdmin className="ml-2" />
-                <span className="pr-2 capitalize text-base leading-7 text-white">
-                  Make as Admin
-                </span>
-              </Button>
+              {!userDetails.isAdmin && (
+                <Button
+                  className="rounded-full py-6"
+                  onClick={handleMakeAdmin}
+                  disabled={makingAdmin}
+                >
+                  <GrUserAdmin className="ml-2" />
+                  <span className="pr-2 capitalize text-base leading-7 text-white">
+                    {makingAdmin ? "Making Admin..." : "Make as Admin"}
+                  </span>
+                </Button>
+              )}
             </div>
             <div className="">
               <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2">

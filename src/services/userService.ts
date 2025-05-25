@@ -55,8 +55,18 @@ const userService = {
   },
 
   // Delete a user (admin only)
-  deleteUser: async (userId: string): Promise<ApiResponse> => {
-    const response = await apiClient.delete<ApiResponse>(`/users/${userId}`);
+  deleteUser: async (userId: string): Promise<ApiResponse<null>> => {
+    const response = await apiClient.delete<ApiResponse<null>>(
+      `/users/${userId}`
+    );
+    return response.data;
+  },
+
+  // Make user an admin (admin only)
+  makeUserAdmin: async (userId: string): Promise<ApiResponse<null>> => {
+    const response = await apiClient.put<ApiResponse<null>>(
+      `/users/${userId}/make-admin`
+    );
     return response.data;
   },
 };
