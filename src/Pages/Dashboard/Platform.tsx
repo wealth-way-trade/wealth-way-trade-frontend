@@ -3,11 +3,11 @@ import BottomBar from "../../Components/Dashboard/BottomBar";
 import LeftBar from "../../Components/Dashboard/LeftBar";
 import RightBar from "../../Components/Dashboard/RightBar";
 import TopBar from "../../Components/Dashboard/TopBar";
-import TradingViewWidget from "../../Components/Dashboard/TradingViewWidget";
 import authService from "../../services/authService";
 import tradeService from "../../services/tradeService";
 import { toast } from "react-toastify";
 import botService, { BotType } from "../../services/botService";
+import TradingViewWidget from "../../Components/Dashboard/UserDashboard/Chart/TradingViewWidget";
 
 const Platform = () => {
   // User data state
@@ -357,14 +357,14 @@ const Platform = () => {
     }).format(amount);
   };
 
-  const formatRemainingTime = (seconds: number): string => {
-    if (seconds >= 60) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-    }
-    return `${seconds}s`;
-  };
+  // const formatRemainingTime = (seconds: number): string => {
+  //   if (seconds >= 60) {
+  //     const minutes = Math.floor(seconds / 60);
+  //     const remainingSeconds = seconds % 60;
+  //     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  //   }
+  //   return `${seconds}s`;
+  // };
 
   // Calculate bot profit rate
   const getBotProfitRate = (): number => {
@@ -393,7 +393,7 @@ const Platform = () => {
             {formatCurrency(balance).replace("PKR", "")}
           </div>
 
-          {tradeStatus === "processing" && (
+          {/* {tradeStatus === "processing" && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-[#171022] p-8 rounded-lg border border-[#403257] text-white text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5f29b7] mx-auto mb-4"></div>
               <h3 className="text-lg font-medium mb-2">Trade in Progress</h3>
@@ -405,7 +405,7 @@ const Platform = () => {
               </p>
               <p className="text-xs text-gray-500 mt-1">Time remaining</p>
             </div>
-          )}
+          )} */}
 
           {tradeStatus === "completed" && tradeResult && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-[#171022] p-8 rounded-lg border border-[#403257] text-white text-center">
@@ -452,7 +452,7 @@ const Platform = () => {
             </div>
           )}
 
-          <TradingViewWidget />
+          <TradingViewWidget tradeStatus={tradeStatus} />
 
           <BottomBar
             amount={amount}
